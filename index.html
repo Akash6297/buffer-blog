@@ -1,0 +1,1189 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffer Blog - Reconstructed High Fidelity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+
+<style>
+    /* 1. CONFIGURATION & BASE STYLES */
+    :root {
+        --buffer-bg: #f7f8f3;
+        --charcoal: #1a232b;
+        --muted-text: #5f6b74;
+        --buffer-green: #2f9f68;
+    }
+
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: var(--buffer-bg);
+        color: var(--charcoal);
+        letter-spacing: -0.01em;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* 2. LAYOUT & GRIDS */
+    .hero-grid, .latest-grid, .featured-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+        .latest-grid, .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 1024px) {
+        .hero-grid { grid-template-columns: 1.8fr 1fr; }
+        .latest-grid, .featured-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .section-band {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .section-band::before {
+        content: "";
+        position: absolute;
+        inset: 0 calc(50% - 50vw);
+        z-index: -1;
+    }
+
+    .section-hero-band::before,
+    .section-warm-band::before {
+        background: #f0f1ea;
+    }
+
+    .section-latest-band::before,
+    .section-light-band::before {
+        background: #fbfcf7;
+    }
+
+    /* 3. CARD COMPONENTS - UPDATED */
+.buffer-card {
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    background: white;
+    /* Default light border to prevent layout jumping */
+    border: 1px solid rgba(0,0,0,0.08); 
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+/* Hover Effect: Thin Black Border */
+.buffer-card:hover {
+    transform: translateY(-4px);
+    border-color: #000000; /* Solid black thin border */
+    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+}
+
+/* 4. BUTTONS & ARROW ANIMATION - UPDATED */
+.arrow-btn {
+    color: currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    overflow: visible;
+}
+
+.arrow-btn:focus-visible {
+    outline: 2px solid var(--buffer-green);
+    outline-offset: 4px;
+    border-radius: 9999px;
+}
+
+.arrow-btn .BlogPostCard_cardIcon__dxZZL {
+    color: #27393f;
+    transform: translate(0, 0) rotate(0deg);
+    transform-origin: center;
+    transition:
+        transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+        color 0.24s ease;
+}
+
+.buffer-card:hover .arrow-btn .BlogPostCard_cardIcon__dxZZL,
+.arrow-btn:focus-visible .BlogPostCard_cardIcon__dxZZL {
+    color: #111827;
+    transform: translate(4px, -4px) rotate(-45deg);
+}
+
+
+
+    .hero-img-frame {
+        padding: 16px 16px 0 16px;
+    }
+
+    .hero-img-frame img {
+        border-radius: 16px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .card-content {
+        padding: 0 20px 24px 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+   
+
+    .browse-btn {
+        border: 1px solid #d1d5db;
+        border-radius: 9999px;
+        padding: 12px 32px;
+        font-size: 14px;
+        font-weight: 700;
+        background-color: white;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .browse-btn:hover {
+        background-color: #f9fafb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 5. NAVIGATION & FILTERS */
+    .filter-scroll-container, .platform-tabs {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 12px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .filter-scroll-container::-webkit-scrollbar, 
+    .platform-tabs::-webkit-scrollbar { display: none; }
+
+    .filter-item, .tab-item {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--muted-text);
+        white-space: nowrap;
+        cursor: pointer;
+        padding-bottom: 12px;
+        margin-bottom: -1px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-item.active, .tab-item.active {
+        color: var(--charcoal);
+        border-bottom: 3px solid var(--buffer-green);
+    }
+
+    .filter-item:hover, .tab-item:hover { color: var(--charcoal); }
+
+    /* 6. PILL SYSTEM (THEMES) */
+    .pill { 
+        font-size: 10px; 
+        font-weight: 700; 
+        padding: 4px 10px; 
+        border-radius: 2px; 
+        text-transform: capitalize; 
+        display: inline-block; 
+    }
+
+    .topic-pill {
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: inline-block;
+        border: 1px solid transparent;
+    }
+
+    .topic-pill:hover {
+        transform: translateY(-2px);
+        filter: brightness(0.95);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* Color Palettes */
+    .pill-instagram, .tp-insights, .tp-instagram { background-color: #ffeef6; color: #b3397d; }
+    .pill-pinterest, .tp-pinterest { background-color: #fff4e5; color: #9c6010; }
+    .pill-creator, .tp-creator { background-color: #fff1e5; color: #a3521d; }
+    .pill-youtube, .tp-youtube, .tp-self, .tp-threads { background-color: #ffe7f0; color: #bc2a8d; }
+    .pill-tiktok, .tp-tiktok { background-color: #fff9e5; color: #8a6a16; }
+    .pill-tools, .tp-tools, .tp-linkedin { background-color: #e5fcf6; color: #1e7f6d; }
+    .pill-social-mkt, .pill-bluesky, .tp-bluesky, .tp-socialmkt, .tp-tips { background-color: #e5f6ff; color: #1d5f8a; }
+    .pill-data, .pill-flow, .tp-email { background-color: #fef3c7; color: #92400e; }
+    .tp-ai { background-color: #ffe8d8; color: #a35d35; }
+    .tp-analytics, .tp-content, .tp-video { background-color: #d1f1d1; color: #2e7d32; }
+    .tp-facebook { background-color: #e0e7ff; color: #3730a3; }
+    .tp-influencer, .tp-productivity, .pill-productivity { background-color: #fae1ff; color: #7e22ce; }
+    .tp-mastodon, .tp-twitter { background-color: #ede9fe; color: #5b21b6; }
+    .tp-news, .tp-smallbiz { background-color: #ffedd5; color: #9a3412; }
+    .tp-open { background-color: #dcfce7; color: #166534; }
+
+    /* 7. SPECIAL SECTIONS (NEWSLETTER) */
+    .newsletter-section {
+        background-color: #ddceff;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+        background-size: 64px 64px;
+        border-radius: 24px;
+        padding: 60px 40px 60px;
+        color: var(--charcoal);
+    }
+
+    .weekly-logo {
+        position: relative;
+        width: min(380px, 100%);
+        min-height: 156px;
+        color: #27393f;
+    }
+
+    .weekly-logo-main {
+        display: block;
+        font-family: 'Pacifico', 'Brush Script MT', cursive;
+        font-size: clamp(104px, 8vw, 132px);
+        font-weight: 400;
+        line-height: 0.92;
+        letter-spacing: 0;
+        color: #27393f;
+        transform: rotate(-3deg);
+    }
+
+    .weekly-logo-kicker {
+        position: absolute;
+        top: 30px;
+        left: 120px;
+        font-family: 'Inter', sans-serif;
+        font-size: 23px;
+        font-style: italic;
+        font-weight: 400;
+        line-height: 1;
+        white-space: nowrap;
+        color: #27393f;
+        transform: rotate(-3deg);
+        transform-origin: left center;
+        z-index: 1;
+    }
+
+    .newsletter-heading {
+        font-family: 'Inter', sans-serif;
+        font-size: 19px;
+        font-weight: 500;
+        letter-spacing: 0.11em;
+        line-height: 1.45;
+        text-transform: uppercase;
+        color: #101923;
+    }
+
+    .newsletter-card {
+        background: #fbfbfb;
+        border-radius: 10px;
+        padding: 30px 48px 14px;
+        min-height: 150px;
+    }
+
+    .newsletter-form-group {
+        display: flex;
+        width: min(450px, 100%);
+        margin: 0 auto 24px;
+    }
+
+    .newsletter-input {
+        background-color: #f0f0f0;
+        border: 1px solid #3f5050;
+        border-right: 0;
+        border-radius: 9px 0 0 9px;
+        padding: 13px 16px;
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        color: #1f2d35;
+        flex: 1;
+        outline: none;
+        min-width: 0;
+    }
+
+    .newsletter-input::placeholder { color: #a9b0b5; }
+
+    .subscribe-btn {
+        background-color: #5f706f;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 0 26px;
+        border-radius: 0 9px 9px 0;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .subscribe-btn:hover { background-color: #4f6260; }
+
+    .newsletter-terms {
+        max-width: 520px;
+        margin: 0 auto;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        line-height: 1.45;
+        color: #6e7880;
+        text-align: center;
+    }
+
+    .newsletter-terms a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .substack-mark {
+        margin-top: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        color: #a8a8a8;
+        text-align: right;
+    }
+
+    @media (max-width: 1023px) {
+        .newsletter-section {
+            padding: 56px 24px;
+        }
+
+        .weekly-logo {
+            margin: 0 auto;
+            width: min(330px, 100%);
+            min-height: 120px;
+        }
+
+        .weekly-logo-main {
+            font-size: clamp(92px, 28vw, 112px);
+        }
+
+        .weekly-logo-kicker {
+            top: 10px;
+            left: 80px;
+            font-size: clamp(18px, 5vw, 21px);
+        }
+
+        .newsletter-heading {
+            font-size: 16px;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .newsletter-card {
+            padding: 24px 18px 14px;
+        }
+
+        .newsletter-form-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .newsletter-input,
+        .subscribe-btn {
+            width: 100%;
+            border-radius: 9px;
+            border: 1px solid #3f5050;
+        }
+
+        .subscribe-btn {
+            min-height: 48px;
+        }
+    }
+</style>
+</head>
+<body class="antialiased">
+
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-2 py-10">
+
+      <section class="section-band section-hero-band max-w-7xl mx-auto px-2 py-12">
+    
+    <!-- Section Header -->
+    <div class="flex justify-between items-end mb-10">
+        <h1 class="text-[32px] font-bold tracking-tight">Buffer<span class="font-normal text-gray-400">Blog</span></h1>
+        <a href="#" class="text-sm font-bold border-b-2 border-gray-900 pb-1 hover:text-emerald-600 hover:border-emerald-600 transition-colors">All posts</a>
+    </div>
+
+    <!-- Hero Grid -->
+    <div class="hero-grid">
+        
+        <!-- Big Featured Card -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <!-- Padded Image Frame -->
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1200" alt="Workspace">
+            </div>
+            
+            <!-- Content Area -->
+            <div class="p-8 pt-6">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[11px] text-gray-400 font-bold tracking-widest uppercase">Apr 27, 2026</span>
+                </div>
+                
+                <h2 class="text-[30px] font-bold leading-[1.2] mb-4 text-[#1a232b]">
+                    24 Free Instagram Tools to Help Grow Your Account in 2026
+                </h2>
+                
+                <p class="text-[#5f6b74] text-lg mb-6 leading-relaxed">
+                    I've pulled together 24 free Instagram tools to help you create and schedule content, analyze performance, and grow your audience for $0.
+                </p>
+                
+                <p class="text-gray-400 text-xs font-bold mb-8">14 minute read</p>
+                
+                <!-- Footer with Circular Button -->
+                <div class="flex items-center justify-between border-t border-gray-50 pt-6">
+                    <div class="flex items-center gap-3">
+                        <img src="https://i.pravatar.cc/100?u=tamilore" class="w-10 h-10 rounded-full object-cover">
+                        <span class="text-sm font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Small Post Stack -->
+        <div class="flex flex-col gap-4 mt-8 lg:mt-0">
+            
+            <!-- Small Card 1 -->
+            <div class="buffer-card group p-6 rounded-[24px] h-full flex flex-col">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-pinterest">Pinterest</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">Apr 28, 2026</span>
+                </div>
+                <h3 class="font-bold text-lg leading-snug mb-8 text-[#1a232b]">
+                    How to Use Pinterest in 2026: A Beginner's Guide for Creators + Businesses
+                </h3>
+                <div class="flex justify-end mt-auto">
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+
+            <!-- Small Card 2 -->
+            <div class="buffer-card group p-6 rounded-[24px] h-full flex flex-col">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">Apr 23, 2026</span>
+                </div>
+                <h3 class="font-bold text-lg leading-snug mb-8 text-[#1a232b]">
+                    How to Make Money on Instagram in 2026: 12 Tried + Tested Ways That Work
+                </h3>
+                <div class="flex justify-end mt-auto">
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+
+            <!-- Small Card 3 -->
+            <div class="buffer-card group p-6 rounded-[24px] h-full flex flex-col">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-creator">Creator</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">Apr 22, 2026</span>
+                </div>
+                <h3 class="font-bold text-lg leading-snug mb-8 text-[#1a232b]">
+                    I'm Growing on Instagram After 10 Years â€“ Here's What I'm Doing Differently
+                </h3>
+                <div class="flex justify-end mt-auto">
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+
+            <!-- Small Card 4 -->
+            <div class="buffer-card group p-6 rounded-[24px] h-full flex flex-col">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">Apr 22, 2026</span>
+                </div>
+                <h3 class="font-bold text-lg leading-snug mb-8 text-[#1a232b]">
+                    The Complete Guide to Using Instagram Stories to Boost Engagement
+                </h3>
+                <div class="flex justify-end mt-auto">
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+        
+        <section class="section-band section-latest-band max-w-7xl mx-auto px-2 py-12">
+    <!-- Section Title -->
+    <h2 class="text-[28px] font-bold mb-10 text-[#1a232b]">Latest</h2>
+
+    <!-- 3-Column Grid -->
+    <div class="latest-grid">
+
+        <!-- Card 1 (Pinterest) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800" alt="Pinterest Blog">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-pinterest">Pinterest</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 28, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">How to Use Pinterest in 2026: A Beginner's Guide for Creators + Businesses</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-6">Learn how to use Pinterest as a creator or business in 2026 â€” set up your account, create pins that get discovered, and reach the right audience.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">19 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 (Instagram) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800" alt="Instagram Money">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 23, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">How to Make Money on Instagram in 2026: 12 Tried + Tested Ways That Work</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-6">From subscriptions to UGC to merch â€” discover 12 ways to monetize your Instagram following, even if you don't have a massive following.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">19 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=sabreen" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Sabreen Haziq</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 (Creator) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800" alt="Creator Growth">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-creator">Creator</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 22, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">I'm Growing on Instagram After 10 Years â€“ Here's What I'm Doing Differently</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-6">Why I'm pivoting from Threads to Instagram and everything I'm doing to grow to 5,000 followers by the end of Q2.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">8 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=tamilore2" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row (No images as per Image 2) -->
+
+        <!-- Card 4 (Instagram) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 22, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">The Complete Guide to Using Instagram Stories to Boost Engagement + Stay Top of Mind</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=shivani" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Shivani Shah</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5 (Instagram) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 20, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">How to Reset Your Instagram Algorithm When Your Feed Needs a Fresh Start</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti2" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6 (YouTube) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-youtube">YouTube</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Apr 16, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">13 Ways to Get More Views on YouTube in 2026 â€“ Tried + Tested</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=rochi" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Rochi Zalani</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+        <section class="section-band section-warm-band max-w-7xl mx-auto px-2 py-12">
+    <!-- Section Title -->
+    <h2 class="text-[28px] font-bold mb-10 text-[#1a232b]">Featured</h2>
+
+    <!-- 3-Column Grid -->
+    <div class="featured-grid">
+
+        <!-- Card 1 (TikTok) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=800" alt="TikTok Timing">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-tiktok">TikTok</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Mar 19, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">The Best Time to Post on TikTok in 2026 â€“ New Data from 7M Posts</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">We analyzed 7.1 million TikTok posts to find the best time to post on TikTok in 2026. Here's what the data says â€” plus how to find your own best times.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">14 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 (Tools) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" alt="Tools Management">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-tools">Tools</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Mar 3, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">The 11 Best Social Media Management Tools in 2026 â€“ Tried + Tested</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">Social media management tools can help take the admin of social media off your plate â€” so you can focus on the fun stuff. Hereâ€™s a list of the 11 best...</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">19 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=rochi" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Rochi Zalani</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 (TikTok) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800" alt="TikTok Algorithm">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-tiktok">TikTok</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Dec 17, 2025</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4 text-[#1a232b]">TikTok Algorithm Guide 2026: Everything We Know About How Videos Are Ranked</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">A deep dive into the TikTok algorithm, how it works, and how you can work with it to enhance your visibility and engagement on the platform.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">13 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti2" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4 (TikTok - Bottom Row) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-tiktok">TikTok</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Dec 12, 2025</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">Top 250 TikTok Hashtags for 2026 + How to Use Them for Growth</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=rochi2" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Rochi Zalani</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5 (Social Media Marketing) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-social-mkt">Social Media Marketing</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Nov 24, 2025</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">How to Create a Social Media Marketing Strategy in 7 Steps</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=rochi3" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Rochi Zalani</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6 (Instagram) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col min-h-[220px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="pill pill-instagram">Instagram</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Jan 21, 2025</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-8 text-[#1a232b]">Instagram Reels Length: How Long Can Reels Be?</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=tamilore3" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+        <section class="section-band section-light-band max-w-7xl mx-auto px-2 py-12">
+    <!-- Header with 'All posts' link -->
+    <div class="flex items-center gap-6 mb-10">
+        <h2 class="text-[28px] font-bold text-[#1a232b]">Browse by topic</h2>
+        <a href="#" class="text-sm font-bold border-b border-gray-900 pb-0.5 hover:text-emerald-600 hover:border-emerald-600 transition-colors">All posts</a>
+    </div>
+
+    <!-- Tags Container -->
+    <div class="flex flex-wrap gap-2 sm:gap-3">
+        <span class="topic-pill tp-ai">AI</span>
+        <span class="topic-pill tp-analytics">Analytics</span>
+        <span class="topic-pill tp-bluesky">Bluesky</span>
+        <span class="topic-pill tp-content">Content Marketing</span>
+        <span class="topic-pill tp-creator">Creator Marketing</span>
+        <span class="topic-pill tp-insights">Social Media Insights</span>
+        <span class="topic-pill tp-email">Email Marketing</span>
+        <span class="topic-pill tp-facebook">Facebook</span>
+        <span class="topic-pill tp-influencer">Influencer Marketing</span>
+        <span class="topic-pill tp-instagram">Instagram</span>
+        <span class="topic-pill tp-linkedin">LinkedIn</span>
+        <span class="topic-pill tp-mastodon">Mastodon</span>
+        <span class="topic-pill tp-news">News</span>
+        <span class="topic-pill tp-bluesky">Open</span> <!-- uses shared color style -->
+        <span class="topic-pill tp-pinterest">Pinterest</span>
+        <span class="topic-pill tp-productivity">Productivity</span>
+        <span class="topic-pill tp-self">Self-Improvement</span>
+        <span class="topic-pill tp-smallbiz">Small Business</span>
+        <span class="topic-pill tp-socialmkt">Social Media Marketing</span>
+        <span class="topic-pill tp-threads">Threads</span>
+        <span class="topic-pill tp-tiktok">TikTok</span>
+        <span class="topic-pill tp-tips">Tips / How-To</span>
+        <span class="topic-pill tp-tools">Tools</span>
+        <span class="topic-pill tp-twitter">Twitter</span>
+        <span class="topic-pill tp-video">Video</span>
+        <span class="topic-pill tp-youtube">Youtube</span>
+    </div>
+</section>
+
+   
+    <!-- MARKETING SECTION -->
+    <section class="section-band section-warm-band max-w-7xl mx-auto px-2 py-12">
+        <h2 class="text-[28px] font-bold mb-6">Marketing</h2>
+        
+        <!-- Horizontal Filter Bar -->
+        <div class="relative flex items-center mb-10">
+            <div class="filter-scroll-container">
+                <span class="filter-item active">AI</span>
+                <span class="filter-item">Analytics</span>
+                <span class="filter-item">Content Marketing</span>
+                <span class="filter-item">Creator Marketing</span>
+                <span class="filter-item">Social Media Insights</span>
+                <span class="filter-item">Email Marketing</span>
+                <span class="filter-item">Influencer Marketing</span>
+                <span class="filter-item">Social Media Marketing</span>
+            </div>
+        </div>
+
+        <!-- Marketing Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Row 1: Cards with Images -->
+            <div class="buffer-card group rounded-[32px] flex flex-col">
+                <div class="hero-img-frame">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800" alt="AI Image Gen">
+                </div>
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-ai">AI</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Apr 15, 2026</span>
+                    </div>
+                    <h3 class="font-bold text-[19px] leading-snug mb-4">The 9 Best AI Image Generators of 2026 (+ Examples)</h3>
+                    <p class="text-[#5f6b74] text-[14px] mb-4">Tried and tested: These AI image generators consistently delivered the best results. Here's a look at how they work.</p>
+                    <p class="text-gray-400 text-[10px] font-bold mb-6">23 minute read</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=tamilore1" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buffer-card group rounded-[32px] flex flex-col">
+                <div class="hero-img-frame">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800" alt="Workflow Guide">
+                </div>
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-flow">Flow</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Feb 5, 2026</span>
+                    </div>
+                    <h3 class="font-bold text-[19px] leading-snug mb-4">14 AI Tools for Social Media Content Creation: My Workflow Guide</h3>
+                    <p class="text-[#5f6b74] text-[14px] mb-4">As a content writer at Buffer who's always deep in the latest AI tools, I've tested dozens to find the ones worth keeping.</p>
+                    <p class="text-gray-400 text-[10px] font-bold mb-6">22 minute read</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=tamilore2" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buffer-card group rounded-[32px] flex flex-col">
+                <div class="hero-img-frame">
+                    <img src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80&w=800" alt="Dictation Tools">
+                </div>
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-open">Open</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Nov 26, 2025</span>
+                    </div>
+                    <h3 class="font-bold text-[19px] leading-snug mb-4">How AI Dictation Tools Changed The Way I Work (And Which Ones Are Worth It)</h3>
+                    <p class="text-[#5f6b74] text-[14px] mb-4">In this article, Kateryna shares the results from testing four AI-powered speech-to-text tools in her daily workflow.</p>
+                    <p class="text-gray-400 text-[10px] font-bold mb-6">6 minute read</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=kateryna" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Kateryna Porshnieva</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Text-only Cards -->
+            <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[200px]">
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-creator">Creator</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Nov 25, 2025</span>
+                    </div>
+                    <h3 class="font-bold text-[18px] leading-snug mb-8">AI Emails Me Content Ideas Every Morning â€“ Here's How That System Works</h3>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=aiza" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Aiza Domingcil</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[200px]">
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-productivity">Productivity</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Nov 20, 2025</span>
+                    </div>
+                    <h3 class="font-bold text-[18px] leading-snug mb-8">8 of the Best AI Productivity Tools to Help You Optimize How You Work</h3>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=kirsti3" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Kirsti Lang</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[200px]">
+                <div class="card-content pt-6">
+                    <div class="flex justify-between mb-4">
+                        <span class="pill pill-ai">AI</span>
+                        <span class="text-[10px] text-gray-400 font-bold">Nov 3, 2025</span>
+                    </div>
+                    <h3 class="font-bold text-[18px] leading-snug mb-8">The Top 10 AI Writing Tools I Recommend as a Professional Writer</h3>
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-2">
+                            <img src="https://i.pravatar.cc/100?u=rochi" class="avatar-sm">
+                            <span class="text-[13px] font-bold">Rochi Zalani</span>
+                        </div>
+                        <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+
+    <!-- NEWSLETTER SECTION: THE WEEKLY SCROLL -->
+    <div class="newsletter-section mt-20 mb-10 grid grid-cols-1 lg:grid-cols-[430px_1fr] items-center gap-12 lg:gap-16">
+        <div>
+            <div class="weekly-logo" aria-label="The Weekly Scroll">
+                <span class="weekly-logo-kicker">The Weekly</span>
+                <span class="weekly-logo-main">Scroll</span>
+            </div>
+        </div>
+
+        <div>
+            <p class="newsletter-heading mb-6">
+                A feel-good newsletter about growing on social from the team at Buffer
+            </p>
+
+            <div class="newsletter-card">
+                <div class="newsletter-form-group">
+                    <input type="email" placeholder="Type your email..." class="newsletter-input">
+                    <button class="subscribe-btn">Subscribe</button>
+                </div>
+
+                <p class="newsletter-terms">
+                    By subscribing you agree to Substack's <a href="#">Terms of Use</a>, our <a href="#">Privacy Policy</a> and <a href="#">our Information collection notice</a>
+                </p>
+
+                <div class="substack-mark">substack</div>
+            </div>
+        </div>
+    </div>
+
+    </section>
+
+        <section class="section-band section-light-band max-w-7xl mx-auto px-6 py-20">
+    <!-- Section Title -->
+    <h2 class="text-[28px] font-bold mb-8 text-[#1a232b]">Social platforms</h2>
+
+    <!-- Platform Filter Tabs -->
+    <div class="platform-tabs">
+        <span class="tab-item active">Bluesky</span>
+        <span class="tab-item">Facebook</span>
+        <span class="tab-item">Instagram</span>
+        <span class="tab-item">LinkedIn</span>
+        <span class="tab-item">Mastodon</span>
+        <span class="tab-item">Pinterest</span>
+        <span class="tab-item">Threads</span>
+        <span class="tab-item">TikTok</span>
+        <span class="tab-item">Twitter</span>
+        <span class="tab-item">Youtube</span>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        
+        <!-- Card 1 (Bluesky Image) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&q=80&w=800" alt="Bluesky Scheduling">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-bluesky">Bluesky</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Feb 17, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4">Here's How to Schedule, Crosspost, and More on Bluesky</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">A step-by-step guide to scheduling Bluesky posts, cross-posting to other platforms like X or Mastodon, and even creating threads.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">7 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti1" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 (Bluesky Image) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=800" alt="Bluesky Setup">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-bluesky">Bluesky</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Jan 15, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4">Bluesky Isn't Like Other Social Networks: Here's How to Get Set Up</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">In this article, we'll walk you through setting up Bluesky and share some tips to help you get started posting on the platform.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">11 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=tamilore4" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 (Bluesky Image) -->
+        <div class="buffer-card group rounded-[32px] flex flex-col">
+            <div class="hero-img-frame">
+                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=800" alt="What is Bluesky">
+            </div>
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-bluesky">Bluesky</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Jan 14, 2026</span>
+                </div>
+                <h3 class="font-bold text-[19px] leading-snug mb-4">What is Bluesky? Here's What You Should Know</h3>
+                <p class="text-[#5f6b74] text-[14px] leading-relaxed mb-4">Bluesky is a decentralized text-based social media platform. Here's your 101.</p>
+                <p class="text-gray-400 text-[10px] font-bold mb-8">8 minute read</p>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=tamilore5" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Text Cards -->
+        
+        <!-- Card 4 (Bluesky Text) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[180px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-bluesky">Bluesky</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Jun 11, 2025</span>
+                </div>
+                <h3 class="font-bold text-[18px] leading-snug mb-8 text-[#1a232b]">Bluesky Verification is Here: How the Blue Check Works</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti3" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5 (Bluesky Text) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[180px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-bluesky">Bluesky</span>
+                    <span class="text-[10px] text-gray-400 font-bold">May 27, 2025</span>
+                </div>
+                <h3 class="font-bold text-[18px] leading-snug mb-8 text-[#1a232b]">'Live Now' Badges are Coming to Bluesky: Here's Everything We Know So Far</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=kirsti4" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Kirsti Lang</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6 (Data Text) -->
+        <div class="buffer-card group rounded-[32px] p-2 flex flex-col min-h-[180px]">
+            <div class="card-content pt-6">
+                <div class="flex justify-between mb-4">
+                    <span class="pill pill-data">Data</span>
+                    <span class="text-[10px] text-gray-400 font-bold">Mar 10, 2025</span>
+                </div>
+                <h3 class="font-bold text-[18px] leading-snug mb-8 text-[#1a232b]">We Analyzed 1.7M Posts from X, Threads, and Bluesky: Here's What We Learned</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-2">
+                        <img src="https://i.pravatar.cc/100?u=tamilore6" class="avatar-sm">
+                        <span class="text-[13px] font-bold">Tamilore Oladipo</span>
+                    </div>
+                    <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="flex flex-col items-center">
+        <p class="text-[16px] font-bold text-[#1a232b] mb-6">Looking for more inspiration?</p>
+        <button class="browse-btn">Browse all posts</button>
+    </div>
+</section>
+
+        <!-- CTA Section -->
+        <section class="max-w-7xl mx-auto mb-20 px-2 sm:px-0">
+            <div class="bg-[#1a232b] rounded-[40px] px-8 sm:px-12 py-16 sm:py-20 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl">
+                <div class="text-center lg:text-left">
+                    <h2 class="text-4xl font-bold text-white mb-4">Try Buffer for free</h2>
+                    <p class="text-gray-400 text-lg">190,000+ people like you use Buffer to build their brand on social media every month</p>
+                </div>
+                <a href="#" class="group bg-[#a8e6a2] hover:bg-[#b2f0ac] text-[#1a232b] font-bold px-10 py-5 rounded-full transition text-lg flex items-center gap-2 shadow-xl shadow-emerald-900/50">
+                    Get started for free <button class="arrow-btn text-gray-400 transition-colors duration-300 group-hover:text-[#1a232b]" aria-label="Read post"><svg class="BlogPostCard_cardIcon__dxZZL h-6 w-6" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.47 4.47a.75.75 0 0 1 1.06 0l7 7a.75.75 0 0 1 0 1.06l-7 7a.75.75 0 1 1-1.06-1.06l5.72-5.72H5a.75.75 0 0 1 0-1.5h12.19l-5.72-5.72a.75.75 0 0 1 0-1.06Z"></path></svg></button>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+
+</body>
+</html>
+
